@@ -8,18 +8,8 @@ sys.setdefaultencoding('utf8')
 ### external libs
 import socket
 from threading import Thread
-import urllib2
 from time import sleep
-from random import randint
-import urllib
-import xml.etree.ElementTree as xtree
-from random import choice
-import contextlib
-import operator
-from itertools import izip
-from collections import namedtuple
-import json
-import datetime
+import random
 
 ### aqua libs
 import linkshort
@@ -36,8 +26,6 @@ class Bot:
 		self.irc = None
 		self.ident = _ident
 		self.user = {}
-
-		self.MAXGEL = 3010895
 		self.gelscraper = gelbooru.GelbooruScraper()
 		
 		self.pingable = True
@@ -270,7 +258,7 @@ class Bot:
 		print tags
 		
 		self.msg(chan, "starting the game!!! looking for a pic in %s" % self.gamestats["current_tags"])
-		tags.append({"s":"rating:safe", "q":"rating:questionable", "e":"rating:explicit"}[choice(mode)])
+		tags.append({"s":"rating:safe", "q":"rating:questionable", "e":"rating:explicit"}[random.choice(mode)])
 		winner = self.gelscraper.scrape(tags)
 		if not winner:
 			self.msg(chan, "try again with a different tags : ( nothing found for this set of tags!!")
