@@ -1,29 +1,48 @@
-~~ aqua.py ~~ - accidental ecchi irc bot in python
+aqua.py
+-----------------------
+accidental ecchi irc bot in python
 
+about
+-----------------------
 hello i am aqua!! http://konosuba.wikia.com/wiki/Aqua
 
 i am the water goddess of the axis cult!
 
-i am a fun interface that lets you link random pictures from certain websites in irc channels! currently i only support gelbooru but i will be able to link pixiv images as well!!
+i am a multithreaded fun interface that lets you link random pictures from certain websites in irc channels! currently i only support gelbooru but i will be able to link pixiv images as well!!
 
 i am an accidental ecchi bot because i didn't know that gelbooru was filled with weirdo pics : ( oh well!!!
 
+sometimes i take a bit long because i forget older pics so i have to dig for them : ((( but i always take under a minute!!
+
+commands
+-----------------------
 here is what i can do!!
 
+	pic general (currently supported: gelbooru)
+	------------------------------------------------------------------
+	?rand				link a random picture	
+	?pic <tags> 		link a random picture in <tags>
+	?safe <tags>		link a (safe!) random picture in <tags>
+	?sfw <tags>			link a (safe or questionable!) random picture in <tags>
+	?lewd <tags>		link a (questionable or explicit!) random picture in <tags>
+	?pron <tags>		link a (explicit!) random picture in <tags> (wow why would you even use this wtf?????)
+			
+			
 	gelbooru general
 	------------------------------------------------------------------
 	?gay 				link a random picture on gelbooru
 	?gel <tags> 		link a random picture in <tags> from gelbooru
-	?safe <tags>		link a (safe!) random picture in <tags> from gelbooru
-	?sfw <tags>			link a (safe or questionable!) random picture in <tags> from gelbooru
-	?sfw <tags>			link a (safe or questionable!) random picture in <tags> from gelbooru
-	?lewd <tags>		link a (questionable or explicit!) random picture in <tags> from gelbooru
-	?pron <tags>		link a (explicit!) random picture in <tags> from gelbooru (wow why would you even use this wtf?????)
+	?gsafe <tags>		link a (safe!) random picture in <tags> from gelbooru
+	?gsfw <tags>			link a (safe or questionable!) random picture in <tags> from gelbooru
+	?glewd <tags>		link a (questionable or explicit!) random picture in <tags> from gelbooru
+	?gpron <tags>		link a (explicit!) random picture in <tags> from gelbooru (wow why would you even use this wtf?????)
 	?wallpaper <tags>	link a wallpaper spec (highres | absurdres) picture in <tags> from gelbooru
 	
-	~~ by the way you can also prepend your tags with - if you DON'T want to see that tag (for example if you only want anime pix and no photos, put -photo as one of the tags)
+	~~ you can also prepend your tags with - if you DON'T want to see that tag (for example if you only want anime pix and no photos, put -photo as one of the tags)
 	~~ gelbooru has some neat features for tags!! check them out here http://gelbooru.com/index.php?page=help&topic=cheatsheet (~pre does not work)
 	~~ if you want to use the OR operator (~tag1 ~tag2) use tag1 | tag2 instead
+	~~ if you think a picture's rating is wrong, sign into gelbooru and change it!!
+	
 	
 	character cards
 	------------------------------------------------------------------
@@ -36,6 +55,7 @@ here is what i can do!!
 	?ayumi				show a random picture of otosaka ayumi
 	?saveybot			show a random picture of chains
 	?neko				show a random neko
+	
 	
 	gelbooru guessing game (gelgame)
 	------------------------------------------------------------------
@@ -52,8 +72,11 @@ here is what i can do!!
 	~~ with more broad searches, you may need to wait up to 30 seconds for me to find a pic! sometimes it's hard for me to remember the older pictures so i have to try to think of them! of course, if you narrow your initial tags a bit more i might be a little faster!
 	
 	
-~~ future things ~~
----------------
-- pixiv support
+future things
+------------------
+- pixiv support (update: if you would really like this, pm golgi on how the interface should be (all the tags are in japanese!!))
 - high score board for gelgame
 - faster notag searching
+- more pic sites!!!
+	- add "user:danbooru" to your tags in a gelbooru search for danbooru	
+	- use ?gsafe for safebooru

@@ -31,8 +31,8 @@ class Bot:
 		self.ident = _ident
 		self.user = {}
 		self.scrapers = {
-			"gelbooru" : scraper.GelbooruScraper(),
-			"pixiv"    : scraper.PixivScraper(username="aquachansama",password="aquaisthebest")
+			"gelbooru" : scraper.GelbooruScraper()
+			#"pixiv"    : scraper.PixivScraper(username="aquachansama",password="aquaisthebest")
 		}
 		
 		self.pingable = True
