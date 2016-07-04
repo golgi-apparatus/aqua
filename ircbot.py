@@ -261,7 +261,7 @@ class Bot:
 		print tags
 		
 		self.msg(chan, "starting the game!!! please wait about 30 seconds.... looking for a pic in %s" % self.gamestats["current_tags"])
-		tags.append({"s":"rating:safe", "q":"rating:questionable", "e":"rating:explicit"}[random.choice(mode)])
+		tags.append({"s":"rating:safe", "q":"rating:questionable", "e":"rating:explicit"}[random.random.choice(mode)])
 		winner = self.gelscraper.scrape(tags)
 		if not winner:
 			self.msg(chan, "try again with a different tags : ( nothing found for this set of tags!!")
