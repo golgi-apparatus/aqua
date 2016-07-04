@@ -328,7 +328,7 @@ class Bot:
 				
 			#self.msg(chan, "\x032taglist: %s" % (" ".join(self.gamestats["current_tags"])))
 			print self.gamestats["current_tags"]
-			gel_url = "http://self.gelscraper.com/index.php?page=post&s=list&tags=%s" %("+".join(self.gamestats["current_tags"]))
+			gel_url = "http://www.gelbooru.com/index.php?page=post&s=list&tags=%s" %("+".join(self.gamestats["current_tags"]))
 			print gel_url
 			self.msg(chan, "\x032taglink: %s" % (linkshort.isgd_short(gel_url)))
 		
