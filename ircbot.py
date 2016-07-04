@@ -38,6 +38,7 @@ class Bot:
 		self.user = {}
 
 		self.MAXGEL = 3010895
+		self.gelscraper = gelbooru.GelbooruScraper()
 		
 		self.pingable = True
 		
@@ -99,12 +100,7 @@ class Bot:
 			self.irc.send ('PONG ' + self.data.split()[1] + '\r\n')
 		#print 'PONG ' + self.data.split() [ 1 ] + '\r\n'
 		
-		print "init gelbooru..."
-		gel_home = "http://gelbooru.com/index.php?page=dapi&s=post&q=index"
-		xmlstr = urllib2.urlopen(gel_home).read().encode("ascii","ignore")
-		root = xtree.fromstring(xmlstr)
-		self.MAXGEL = int(root.attrib["count"])
-		print self.MAXGEL
+
 		
 		return True
 
@@ -191,75 +187,75 @@ class Bot:
 	def quit(self):
 		self.pingable = False
 
-	def linker(self, tags, err="stop looking up ecchi you...you...h-h-hentai!!!!!!", n="", scr=gelbooru.scrape):
+	def linker(self, tags,  scr, err="stop looking up ecchi you...you...h-h-hentai!!!!!!", n=""):
 		c = scr(tags)
-		return ("%s, gel link: %s \x037 src link: %s \x033total: %i\x038 posted: %s  \x034id: %s \x032tags: %s " %(n, linkshort.isgd_short(gelbooru.link(c['id'])), c["file_url"], c["total_resluts"], c["created_at"], c["id"], c["tags"])) if c else err
+		return ("%s, gel link: %s \x037 src link: %s \x033total: %i\x038 posted: %s  \x034id: %s \x032tags: %s " %(n, linkshort.isgd_short(self.gelscraper.link(c['id'])), c["file_url"], c["total_resluts"], c["created_at"], c["id"], c["tags"])) if c else err
 	
 	def gel_rand(self, chan, dum, nick):
-		g =  self.linker((), n=nick, scr=gelbooru.random)
+		g =  self.linker((), n=nick, scr=self.gelscraper.random)
 		self.msg(chan, g)
 	
 	
 	def gel(self, chan, tags, nick):
-		m = self.linker(tags, err="%s, stop looking up ecchi you...you...h-h-hentai!!!!!!" % nick, n=nick, scr=gelbooru.scrape if tags else gelbooru.random)
+		m = self.linker(tags, err="%s, stop looking up ecchi you...you...h-h-hentai!!!!!!" % nick, n=nick, scr=self.gelscraper.scrape if tags else self.gelscraper.random)
 		if m: self.msg(chan, m)
 		
 		
 	def sfw(self, chan, tags, nick):
 		tags.append("-rating:explicit")
-		m = self.linker(tags, err="just because it is safe for work does not mean it is safe for you!! we all know you just wanted to find some hentai, %s...." % nick, n=nick, scr=gelbooru.scrape)
+		m = self.linker(tags, err="just because it is safe for work does not mean it is safe for you!! we all know you just wanted to find some hentai, %s...." % nick, n=nick, scr=self.gelscraper.scrape)
 		if m: self.msg(chan, m)
 		
 	def lewd(self, chan, tags, nick):
 		tags.append("-rating:safe")
-		m = self.linker(tags, err="see, there are no disgraceful pictures for embarassments to society like you, %s!" % nick, n=nick, scr=gelbooru.scrape )
+		m = self.linker(tags, err="see, there are no disgraceful pictures for embarassments to society like you, %s!" % nick, n=nick, scr=self.gelscraper.scrape )
 		if m: self.msg(chan, m)		
 		
 	def safe(self, chan, tags, nick):
 		tags.append("rating:safe")
-		m = self.linker(tags,  err="%s, little children should not be looking on a site for weeaboos! please go outside and play..." % nick, n=nick, scr=gelbooru.scrape)
+		m = self.linker(tags,  err="%s, little children should not be looking on a site for weeaboos! please go outside and play..." % nick, n=nick, scr=self.gelscraper.scrape)
 		if m: self.msg(chan, m)
 		
 	def pron(self, chan, tags, nick):
 		tags.append("rating:explicit")
 		self.msg(chan, "wow you must be a big hentai if you want to only look at the explicit pictures...it's no wonder why you'll never get a girlfriend, %s!" % nick)
-		m = self.linker(tags, err="see, %s,  there's no disgraceful pictures for embarassments to society like you!" % nick, n=nick, scr=gelbooru.scrape)
+		m = self.linker(tags, err="see, %s,  there's no disgraceful pictures for embarassments to society like you!" % nick, n=nick, scr=self.gelscraper.scrape)
 		if m: self.msg(chan, m)
 		
 	def wallpaper(self, chan, tags, nick):
 		tags.append("highres")
 		tags.append("|")
 		tags.append("absurdres")
-		m = self.linker(tags, n=nick, scr=gelbooru.scrape)
+		m = self.linker(tags, n=nick, scr=self.gelscraper.scrape)
 		if m: self.msg(chan, m)
 	
 	
 	def aqua(self, chan, dum, nick):
-		self.msg(chan, "this is me ^o^ i am the water goddess. bow down to me!! worship aqua-sama, the lord. i link messed up anime pics and you can play a guessing game with gelbooru pics with me!!")
-		self.gel(chan, ["aqua_(konosuba)"])
+		self.msg(chan, "this is me ^o^ i am the water goddess. bow down to me!! worship aqua-sama, the lord. i link messed up anime pics and you can play a guessing game with self.gelscraper pics with me!!")
+		self.gel(chan, ["aqua_(konosuba)"], nick)
 	
 	def ayumi(self, chan, dum, nick):
 		self.msg(chan, "this is ayumi-chan! she is a cool game host who hosts the most popular game on savespam, wordgame! have some high paced fun action with your friends and get better at english vocabulary!")
-		self.gel(chan, ["otosaka_ayumi"])
+		self.gel(chan, ["otosaka_ayumi"], nick)
 		
 	def neko(self, chan, dum, nick):
-		self.gel(chan, ["cat_ears"])
+		self.gel(chan, ["cat_ears"], nick)
 		
 	def megumi(self, chan, dum, nick):
 		self.msg(chan, "this is megu-chan. she is pretty cute but also a big slut!!! she likes playing wordgame extremely fast and making funny faces! she says she's the fastest and best wordgame player in the world but maybe you can beat her? some people have!")
-		self.gel(chan, ["katou_megumi"])
+		self.gel(chan, ["katou_megumi"], nick)
 	
 	def kiyomi(self, chan, dum, nick):
 		self.msg(chan, "this is kiyomi-san : O she has cool megane and she is very smart! ask her about the weather or your bus schedule or almost anything factual!! ika musume is her best friend : )")
-		self.sfw(chan, ["sakura_kiyomi"])
+		self.sfw(chan, ["sakura_kiyomi"], nick)
 
 	def fozrucix(self, chan, dum, nick):
 		self.msg(chan, "this is fozrucix-kun!! he is actually a computer! he can process cool fucking jengascript commands! also he has a q timer and posts website link metadata! also he is a FUCKING ASSHOLE!!!!!!!! so he can tell u if anything is bullshit")
-		self.gel(chan, ["computer"])
+		self.gel(chan, ["computer"], nick)
 		
 	def saveybot(self, chan, dum, nick):
 		self.msg(chan, "this is saveybot! he is the original bot... he can save cool things u type with the .save command! people like to chain him up for some reason..... 8=======D")
-		self.gel(chan, ["chains"])
+		self.gel(chan, ["chains"], nick)
 
 		
 		
@@ -275,7 +271,7 @@ class Bot:
 		
 		self.msg(chan, "starting the game!!! looking for a pic in %s" % self.gamestats["current_tags"])
 		tags.append({"s":"rating:safe", "q":"rating:questionable", "e":"rating:explicit"}[choice(mode)])
-		winner = gelbooru.scrape(tags)
+		winner = self.gelscraper.scrape(tags)
 		if not winner:
 			self.msg(chan, "try again with a different tags : ( nothing found for this set of tags!!")
 			self.pingable = True
@@ -292,7 +288,7 @@ class Bot:
 		self.gamestats["current_guess"] = "-1"
 		
 		self.gamestats["player"] = "!!!"
-		self.gamestats["gel_link"] = "http://gelbooru.com/index.php?page=post&s=view&id=%s" % self.gamestats["id"]
+		self.gamestats["gel_link"] = "http://self.gelscraper.com/index.php?page=post&s=view&id=%s" % self.gamestats["id"]
 		self.msg(chan, "\x034helo gays!! it is time to play gelgame! this version of gelgame is: %s. guess a $tag to get some hints at what the pic is or guess the $pic id number or link to try to guess the picture!!" % mode)
 		self.game_on = True
 		print self.gamestats
@@ -310,7 +306,7 @@ class Bot:
 		
 		if self.gamestats["id"] == self.gamestats["current_guess"]:
 			self.msg(chan, "\x033congratulations %s!!! you are the hentai expert!! that game took\x03 %i pic guesses\x033 and\x032 %i tag guesses \x033( \x039+%i \x034-%i \x033)... \x033here is the picture link!" % (self.gamestats["player"], self.gamestats["guesses"], self.gamestats["tag_guesses"], self.gamestats["+"], self.gamestats["-"]))
-			self.msg(chan, gelbooru.link(self.gamestats["id"]))
+			self.msg(chan, self.gelscraper.link(self.gamestats["id"]))
 			self.game_on = False
 			
 		else:
@@ -344,7 +340,7 @@ class Bot:
 				
 			#self.msg(chan, "\x032taglist: %s" % (" ".join(self.gamestats["current_tags"])))
 			print self.gamestats["current_tags"]
-			gel_url = "http://gelbooru.com/index.php?page=post&s=list&tags=%s" %("+".join(self.gamestats["current_tags"]))
+			gel_url = "http://self.gelscraper.com/index.php?page=post&s=list&tags=%s" %("+".join(self.gamestats["current_tags"]))
 			print gel_url
 			self.msg(chan, "\x032taglink: %s" % (linkshort.isgd_short(gel_url)))
 		
