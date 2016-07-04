@@ -3,6 +3,7 @@ import sys
 import requests
 import xml.etree.ElementTree as xtree
 import random
+import pixiv
 
 class GelbooruScraper:
 	MAXGEL = 3000000
