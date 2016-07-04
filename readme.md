@@ -52,4 +52,8 @@ here is what i can do!!
 	~~ with more broad searches, you may need to wait up to 30 seconds for me to find a pic! sometimes it's hard for me to remember the older pictures so i have to try to think of them! of course, if you narrow your initial tags a bit more i might be a little faster!
 	
 	
-future: pixiv support, high score board for gelgame, faster notag searching
+~~ future things ~~
+---------------
+pixiv support
+high score board for gelgame
+faster notag searching
