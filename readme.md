@@ -1,4 +1,4 @@
-aqua.py - accidental ecchi irc bot in python
+~~ aqua.py ~~ - accidental ecchi irc bot in python
 
 hello i am aqua!! http://konosuba.wikia.com/wiki/Aqua
 
@@ -54,6 +54,6 @@ here is what i can do!!
 	
 ~~ future things ~~
 ---------------
-pixiv support
-high score board for gelgame
-faster notag searching
+- pixiv support
+- high score board for gelgame
+- faster notag searching
