@@ -13,8 +13,7 @@ import random
 
 ### aqua libs
 import linkshort
-import gelbooru
-import pixiv_wrapper
+import scraper
 
 class Bot:
 	# main functions 
@@ -26,7 +25,7 @@ class Bot:
 		self.irc = None
 		self.ident = _ident
 		self.user = {}
-		self.gelscraper = gelbooru.GelbooruScraper()
+		self.gelscraper = scraper.GelbooruScraper()
 		
 		self.pingable = True
 		
@@ -60,6 +59,7 @@ class Bot:
 			"?pron" : self.pron,
 			"?lewd" : self.lewd,
 			"?neko" : self.neko,
+			"?help" : self.help,
 			#"%%seppuku" : self.seppuku,
 			
 			"$gelgame" : self.game,
@@ -161,6 +161,8 @@ class Bot:
 		self.irc.send(send)
 	
 	# command functions
+	def help(self, chan, dum, nick):
+		self.msg(chan, "wow do you need some HELP, %s??? here u go!! https://github.com/golgi-apparatus/aqua/blob/master/readme.md" % nick)
 
 	def water(self, chan, dum, nick):
 		self.msg(chan, "%s, drink water you dong!!!" % nick)
@@ -175,46 +177,47 @@ class Bot:
 	def quit(self):
 		self.pingable = False
 
-	def linker(self, tags,  scr, err="stop looking up ecchi you...you...h-h-hentai!!!!!!", n=""):
+	## gelbooru
+	def gel_linker(self, tags, scr, err="stop looking up ecchi you...you...h-h-hentai!!!!!!", n=""):
 		c = scr(tags)
 		return ("%s, gel link: %s \x037 src link: %s \x033total: %i\x038 posted: %s  \x034id: %s \x032tags: %s " %(n, linkshort.isgd_short(self.gelscraper.link(c['id'])), c["file_url"], c["total_resluts"], c["created_at"], c["id"], c["tags"])) if c else err
 	
 	def gel_rand(self, chan, dum, nick):
-		g =  self.linker((), n=nick, scr=self.gelscraper.random)
+		g =  self.gel_linker((), n=nick, scr=self.gelscraper.random)
 		self.msg(chan, g)
 	
 	
 	def gel(self, chan, tags, nick):
-		m = self.linker(tags, err="%s, stop looking up ecchi you...you...h-h-hentai!!!!!!" % nick, n=nick, scr=self.gelscraper.scrape if tags else self.gelscraper.random)
+		m = self.gel_linker(tags, err="%s, stop looking up ecchi you...you...h-h-hentai!!!!!!" % nick, n=nick, scr=self.gelscraper.scrape if tags else self.gelscraper.random)
 		if m: self.msg(chan, m)
 		
 		
 	def sfw(self, chan, tags, nick):
 		tags.append("-rating:explicit")
-		m = self.linker(tags, err="just because it is safe for work does not mean it is safe for you!! we all know you just wanted to find some hentai, %s...." % nick, n=nick, scr=self.gelscraper.scrape)
+		m = self.gel_linker(tags, err="just because it is safe for work does not mean it is safe for you!! we all know you just wanted to find some hentai, %s...." % nick, n=nick, scr=self.gelscraper.scrape)
 		if m: self.msg(chan, m)
 		
 	def lewd(self, chan, tags, nick):
 		tags.append("-rating:safe")
-		m = self.linker(tags, err="see, there are no disgraceful pictures for embarassments to society like you, %s!" % nick, n=nick, scr=self.gelscraper.scrape )
+		m = self.gel_linker(tags, err="see, there are no disgraceful pictures for embarassments to society like you, %s!" % nick, n=nick, scr=self.gelscraper.scrape )
 		if m: self.msg(chan, m)		
 		
 	def safe(self, chan, tags, nick):
 		tags.append("rating:safe")
-		m = self.linker(tags,  err="%s, little children should not be looking on a site for weeaboos! please go outside and play..." % nick, n=nick, scr=self.gelscraper.scrape)
+		m = self.gel_linker(tags,  err="%s, little children should not be looking on a site for weeaboos! please go outside and play..." % nick, n=nick, scr=self.gelscraper.scrape)
 		if m: self.msg(chan, m)
 		
 	def pron(self, chan, tags, nick):
 		tags.append("rating:explicit")
 		self.msg(chan, "wow you must be a big hentai if you want to only look at the explicit pictures...it's no wonder why you'll never get a girlfriend, %s!" % nick)
-		m = self.linker(tags, err="see, %s,  there's no disgraceful pictures for embarassments to society like you!" % nick, n=nick, scr=self.gelscraper.scrape)
+		m = self.gel_linker(tags, err="see, %s,  there's no disgraceful pictures for embarassments to society like you!" % nick, n=nick, scr=self.gelscraper.scrape)
 		if m: self.msg(chan, m)
 		
 	def wallpaper(self, chan, tags, nick):
 		tags.append("highres")
 		tags.append("|")
 		tags.append("absurdres")
-		m = self.linker(tags, n=nick, scr=self.gelscraper.scrape)
+		m = self.gel_linker(tags, n=nick, scr=self.gelscraper.scrape)
 		if m: self.msg(chan, m)
 	
 	
@@ -257,7 +260,7 @@ class Bot:
 		self.gamestats["current_tags"] = tags
 		print tags
 		
-		self.msg(chan, "starting the game!!! looking for a pic in %s" % self.gamestats["current_tags"])
+		self.msg(chan, "starting the game!!! please wait about 30 seconds.... looking for a pic in %s" % self.gamestats["current_tags"])
 		tags.append({"s":"rating:safe", "q":"rating:questionable", "e":"rating:explicit"}[random.choice(mode)])
 		winner = self.gelscraper.scrape(tags)
 		if not winner:
@@ -353,7 +356,11 @@ class Bot:
 	def game_pron(self, chan, tags, nick):
 		gt = Thread(target=self.gelgame, args=(chan, tags,"e"))
 		gt.start()	
-		
+	
+
+	## pixiv
+
+	
 	def quit(self):
 		self.irc.send("QUIT :aqua-sama is the best goddess! bow down to me!!!\r\n")
 		self.pingable = False
