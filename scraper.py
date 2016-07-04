@@ -1,11 +1,20 @@
 from tag_parser import tag_parser
 import sys
 import requests
+#from requests_oauthlib import OAuth1
 import xml.etree.ElementTree as xtree
 import random
-import pixiv
 
-class GelbooruScraper:
+class Scraper:
+	def scrape(self, tags):
+		raise NotImplementedError("scrape should scrape from the website and return a dict with 'tag':'info' key:value pairs")
+	def random(self):
+		raise NotImplementedError("random should pick a random picture ideally using an ID number (should be faster than linker with zero args) and return a string ")
+	def link(self, id):	
+		raise NotImplementedError("link should use the <id> parameter and return link with that ID")
+	
+
+class GelbooruScraper(Scraper):
 	MAXGEL = 3000000
 	def __init__(self):
 		print "init gelbooru..."
@@ -55,3 +64,25 @@ class GelbooruScraper:
 	def link(self, id):
 		return "http://gelbooru.com/index.php?page=post&s=view&id=%s" % id 
 		
+
+# pixiv's interface is SHIT! also all the tags are in nipponese.
+# i will implement this if i get enough demand for it and some example syntaxes (translating the tags would be a bad idea i m o)
+# pixiv random might be possible though
+class PixivScraper(Scraper):
+	def __init__(self, username, password):
+		pass
+		'''
+		# login
+		auth_url = "https://oauth.secure.pixiv.net/auth/token"
+        auth_data = OAuth1('bYGKuGVw91e0NMfPGp44euvGt59s','HP3RmkgAmEGro0gn1x9ioawQE8WMfvLXDz3ZqxpK', username, password)
+		requests.get(auth_url, auth=auth_data)
+		'''
+		
+	def scrape(self, tags):
+		pass
+		
+	def random(self, tags):
+		pass
+		
+	def link(self, id):
+		pass
