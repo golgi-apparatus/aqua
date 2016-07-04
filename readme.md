@@ -72,6 +72,14 @@ here is what i can do!!
 	~~ with more broad searches, you may need to wait up to 30 seconds for me to find a pic! sometimes it's hard for me to remember the older pictures so i have to try to think of them! of course, if you narrow your initial tags a bit more i might be a little faster!
 	
 	
+dependencies
+------------------
+- python 2.7 core
+	- https://www.python.org/download/releases/2.7/
+- requests 
+	- http://docs.python-requests.org/en/master/
+
+	
 future things
 ------------------
 - pixiv support (update: if you would really like this, pm golgi on how the interface should be (all the tags are in japanese!!))
