@@ -1,3 +1,5 @@
+import random
+
 # this needs to be refactored lol
 def tag_parser(tags):
 	tlen = len(tags)
@@ -6,10 +8,10 @@ def tag_parser(tags):
 	while t < tlen:
 		tt = tags[t]
 		if t > 0 and t < tlen-1 and tt == "|":
-			cc = choice((-1,1))
+			cc = random.choice((-1,1))
 			tt = tags[t+cc]
 			if cc == -1: t+=1
-			if choice((0, 1)) == 0: newtags[-1] = tt
+			if random.choice((0, 1)) == 0: newtags[-1] = tt
 		else: newtags.append(tt)
 		t+=1
 
