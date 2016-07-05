@@ -8,18 +8,6 @@ sys.setdefaultencoding('utf8')
 ### external libs
 import socket
 from threading import Thread
-import urllib2
-from time import sleep
-from random import randint
-import urllib
-import xml.etree.ElementTree as xtree
-from random import choice
-import contextlib
-import operator
-from itertools import izip
-from collections import namedtuple
-import json
-import py_compile
 
 ### aqua libs
 import ircbot
