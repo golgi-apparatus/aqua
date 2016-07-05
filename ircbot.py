@@ -19,6 +19,12 @@ import scraper
 def choicedict(dic):
 	return random.choice(list(dic.values()))
 
+def searchkey(diclist, k, v):
+	for i in diclist:
+		if diclist[k] == v:
+			return i
+	
+	return None
 ## bot
 class Bot:
 	# main functions 
@@ -85,7 +91,8 @@ class Bot:
 			"$gelgame_sfw" : self.game_sfw,
 			"$gelgame_pron" : self.game_pron,
 			"$pic" : self.gelgame_guess,
-			"$tag" : self.gelgame_tag
+			"$tag" : self.gelgame_tag,
+			"?scoreboard" : self.gelgame_scoreboard
 		
 		}
 			
@@ -322,8 +329,13 @@ class Bot:
 			self.msg(chan, "try again with a different tags : ( nothing found for this set of tags!!")
 			self.pingable = True
 			return
+		# read highscoreboard
+		with open("scoreboard.sc", "r") as sc:
+			scores = [line.split() for line in sc]
+			
+		self.gamestats["scoreboard"]  = {s[0] :  {"wins": int(s[1]), "games": int(s[2]), "+": int(s[3]), "-": int(s[4]) } for s in scores}
 		
-
+		self.gamestats["players"] = []
 		self.gamestats["id"] = winner["id"]
 		self.gamestats["guesses"] = 1
 		self.gamestats["tag_guesses"] = 0
@@ -333,7 +345,6 @@ class Bot:
 		
 		self.gamestats["current_guess"] = "-1"
 		
-		self.gamestats["player"] = "!!!"
 		self.gamestats["gel_link"] = "http://www.gelbooru.com/index.php?page=post&s=view&id=%s" % self.gamestats["id"]
 		self.msg(chan, "\x034helo gays!! it is time to play gelgame! this version of gelgame is: %s. guess a $tag to get some hints at what the pic is or guess the $pic id number or link to try to guess the picture!!" % mode)
 		self.game_on = True
@@ -347,25 +358,43 @@ class Bot:
 			
 		print "$$pic attempt!!!"
 		if not guess: return
-		self.gamestats["player"] = nick
-		self.gamestats["current_guess"] = guess[0]
+		self.gamestats["current_guess"] = guess[0][guess[0].rfind("=")+1:]
 		
 		if self.gamestats["id"] == self.gamestats["current_guess"]:
-			self.msg(chan, "\x033congratulations %s!!! you are the hentai expert!! that game took\x03 %i pic guesses\x033 and\x032 %i tag guesses \x033( \x039+%i \x034-%i \x033)... \x033here is the picture link!" % (self.gamestats["player"], self.gamestats["guesses"], self.gamestats["tag_guesses"], self.gamestats["+"], self.gamestats["-"]))
+			self.msg(chan, "\x033congratulations %s!!! you are the hentai expert!! that game took\x03 %i pic guesses\x033 and\x032 %i tag guesses \x033( \x039+%i \x034-%i \x033)... \x033here is the picture link!" % (nick, self.gamestats["guesses"], self.gamestats["tag_guesses"], self.gamestats["+"], self.gamestats["-"]))
 			self.msg(chan, self.scrapers["gelbooru"].link(self.gamestats["id"]))
+			
+			if nick not in self.gamestats["scoreboard"]:
+				self.gamestats["scoreboard"][nick] = {"wins" : 1, "games" : 1, "+" : 0, "-" : 0}
+			
+			else:
+				self.gamestats["scoreboard"][nick]["wins"]+=1
+			
+			scores = sorted( ((v["wins"], k, v) for k, v in self.gamestats["scoreboard"].iteritems()), reverse=True) # babby's first generator expression and also lambda (oh no)
+			print scores
+			with open("scoreboard.sc", "w") as sc:
+				for s in scores:
+					sc.write("%s %i %i %i %i\n" % (s[1], s[0], s[2]["games"], s[2]["+"], s[2]["-"]))
+			
 			self.game_on = False
 			
 		else:
-			self.msg(chan, "\x034no, %s, you are a wrong dong!!! please try again..." % self.gamestats["player"])
+			self.msg(chan, "\x034no, %s, you are a wrong dong!!! please try again..." % nick)
 			self.gamestats["guesses"]+=1
-			
+			if nick not in tuple(self.gamestats["scoreboard"]):
+				self.gamestats["scoreboard"][nick] = {"wins" : 0, "games" : 1, "+" : 0, "-" : 0}	
+			if nick not in self.gamestats["players"]:
+				self.gamestats["players"].append(nick)
+				self.gamestats["scoreboard"][nick]["games"]+=1
+						
+				
 		print self.gamestats
 		
 	def gelgame_tag(self, chan, tags, nick):
 		if not self.game_on:
 			if not self.pingable: self.msg(chan, "hey there is no gay going on!! start one with $gelgame, $gelgame_safe, $gelgame_lewd, $gelgame_sfw, or $gelgame_pron!!")
 			return
-		
+		plus, minus = 0, 0
 		print "$$tag attempt!!"
 		for t in tags:
 			if t == "pantsu": t = "panties"
@@ -375,15 +404,27 @@ class Bot:
 				self.msg(chan, "nice!! %s is one of the tags!!" % t)
 				self.gamestats["+"]+=1
 				self.gamestats["current_tags"].append(t.replace("+","%2b"))
+				plus = 1
 				
 			else:
 				if t not in self.gamestats["current_tags"]:
 					self.gamestats["-"]+=1
 					self.msg(chan, "\x034 %s is not one of the tags" % (t))
 					self.gamestats["current_tags"].append("-"+t.replace("+","%2b"))
+					minus = 1
 					
 				else: self.msg(chan, "\x034 %s was already guessed" % t)
+			
+			if nick not in self.gamestats["players"]:
+				self.gamestats["players"].append(nick)
 				
+			if nick not in tuple(self.gamestats["scoreboard"]):
+				self.gamestats["scoreboard"][nick] = {"wins" : 0, "games" : 1, "+" : plus, "-" : minus}
+				
+			else:
+				if plus: self.gamestats["scoreboard"][nick]["+"]+=1  
+				elif minus: self.gamestats["scoreboard"][nick]["-"]+=1
+			
 			#self.msg(chan, "\x032taglist: %s" % (" ".join(self.gamestats["current_tags"])))
 			print self.gamestats["current_tags"]
 			gel_url = "http://www.gelbooru.com/index.php?page=post&s=list&tags=%s" %("+".join(self.gamestats["current_tags"]))
@@ -412,6 +453,16 @@ class Bot:
 		gt = Thread(target=self.gelgame, args=(chan, tags,"e"))
 		gt.start()	
 	
+	def gelgame_scoreboard(self, chan, tags, nick):
+		with open("scoreboard.sc", "r") as sc:
+			i = 1
+			self.msg(chan, "------------------------------")
+			self.msg(chan, "| gelgame scoreboard")
+			for line in sc:
+				l = line.split()
+				self.msg(chan, "| %i) %s: %s wins/%s games ( +%s -%s )" %(i, l[0], l[1], l[2], l[3], l[4]))
+				i+=1
+			self.msg(chan, "------------------------------")
 
 	## pixiv
 
