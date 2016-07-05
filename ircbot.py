@@ -417,6 +417,7 @@ class Bot:
 			
 			if nick not in self.gamestats["players"]:
 				self.gamestats["players"].append(nick)
+				self.gamestats["scoreboard"][nick]["games"]+=1
 				
 			if nick not in tuple(self.gamestats["scoreboard"]):
 				self.gamestats["scoreboard"][nick] = {"wins" : 0, "games" : 1, "+" : plus, "-" : minus}
