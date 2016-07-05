@@ -68,6 +68,7 @@ here is what i can do!!
 	$gelgame_pron <tags>		start a new (explicit) gelgame in <tags>
 	$tag <tags>					add new <tags> to the taglist and post the corresponding gelbooru search link with the tags
 	$pic <id>					attempt to guess the picture using <id> (use the id number in the link!)
+	?scoreboard					show the gelgame scoreboard!! how good are u at this???
 	
 	~~ with more broad searches, you may need to wait up to 30 seconds for me to find a pic! sometimes it's hard for me to remember the older pictures so i have to try to think of them! of course, if you narrow your initial tags a bit more i might be a little faster!
 	
