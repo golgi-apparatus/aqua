@@ -409,14 +409,14 @@ class Bot:
 				self.msg(chan, "nice!! %s is one of the tags!!" % t)
 				self.gamestats["+"]+=1
 				self.gamestats["current_tags"].append(t.replace("+","%2b"))
-				plus = 1
+				plus += 1
 				
 			else:
 				if t not in self.gamestats["current_tags"]:
 					self.gamestats["-"]+=1
 					self.msg(chan, "\x034 %s is not one of the tags" % (t))
 					self.gamestats["current_tags"].append("-"+t.replace("+","%2b"))
-					minus = 1
+					minus += 1
 					
 				else: self.msg(chan, "\x034 %s was already guessed" % t)
 			
@@ -428,8 +428,8 @@ class Bot:
 				self.gamestats["scoreboard"][nick] = {"wins" : 0, "games" : 1, "+" : plus, "-" : minus}
 				
 			else:
-				if plus: self.gamestats["scoreboard"][nick]["+"]+=1  
-				elif minus: self.gamestats["scoreboard"][nick]["-"]+=1
+				if plus: self.gamestats["scoreboard"][nick]["+"]+=plus  
+				if minus: self.gamestats["scoreboard"][nick]["-"]+=minus
 			
 			#self.msg(chan, "\x032taglist: %s" % (" ".join(self.gamestats["current_tags"])))
 			print self.gamestats["current_tags"]
