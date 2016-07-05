@@ -1,9 +1,27 @@
-from tag_parser import tag_parser
 import sys
 import requests
 #from requests_oauthlib import OAuth1
 import xml.etree.ElementTree as xtree
 import random
+
+# tag parsing helper function
+def tag_parser(tags):
+	tlen = len(tags)
+	newtags = []
+	t = 0
+	while t < tlen:
+		tt = tags[t]
+		if t > 0 and t < tlen-1 and tt == "|":
+			cc = random.choice((-1,1))
+			tt = tags[t+cc]
+			if cc == -1: t+=1
+			if random.choice((0, 1)) == 0: newtags[-1] = tt
+		else: newtags.append(tt)
+		t+=1
+
+	return {}.fromkeys(newtags).keys()
+
+# scraper classes
 
 class Scraper:
 	def scrape(self, tags):
