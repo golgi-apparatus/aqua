@@ -18,6 +18,11 @@ commands
 -----------------------
 here is what i can do!!
 
+	misc
+	------------------------------------------------------------------
+	?help				link to this page!
+	?bug				link to the issue tracker! report some bugs or request some features
+
 	pic general (currently supported: gelbooru)
 	------------------------------------------------------------------
 	?rand				link a random picture	

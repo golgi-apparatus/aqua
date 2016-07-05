@@ -82,7 +82,9 @@ class Bot:
 			"?saveybot" : self.saveybot,
 			"?ayumi" : self.ayumi,
 			"?neko" : self.neko,
+			
 			"?help" : self.help,
+			"?bug" : self.bug,
 			#"%%seppuku" : self.seppuku,
 			
 			"$gelgame" : self.game,
@@ -187,6 +189,9 @@ class Bot:
 	# command functions
 	def help(self, chan, dum, nick):
 		self.msg(chan, "wow do you need some HELP, %s??? here u go!! https://github.com/golgi-apparatus/aqua/blob/master/readme.md" % nick)
+	
+	def bug(self, chan, dum, nick):
+		self.msg(chan, "wanna report a bug or request a new feature, %s??? do it here! https://github.com/golgi-apparatus/aqua/issues" % nick)
 
 	def water(self, chan, dum, nick):
 		self.msg(chan, "%s, drink water you dong!!!" % nick)
