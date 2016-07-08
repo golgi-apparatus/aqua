@@ -333,13 +333,13 @@ class Bot:
 		if self.game_on:
 			self.msg(chan, "hey there is already a gay going on!! let that one finish first!!")
 			return
-		
+		rates = {"s":"rating:safe", "q":"rating:questionable", "e":"rating:explicit"}
 		# start a new game!!
 		self.gamestats["current_tags"] = tags
 		print tags
 		
 		self.msg(chan, "starting the game!!! please wait about 30 seconds.... looking for a pic in %s" % self.gamestats["current_tags"])
-		if mode: tags.append({"s":"rating:safe", "q":"rating:questionable", "e":"rating:explicit"}[random.choice(mode)])
+		if mode: tags.append(rates[random.choice(mode)])
 		winner = self.scrapers["gelbooru"].scrape(tags)
 		
 		if not winner:
@@ -359,6 +359,7 @@ class Bot:
 		self.gamestats["+"] = 0
 		self.gamestats["-"] = 0
 		self.gamestats["tags"] = winner["tags"].split()
+		self.gamestats["tags"].append(rates[winner["rating"]])
 		
 		self.gamestats["current_guess"] = "-1"
 		
@@ -399,7 +400,7 @@ class Bot:
 			self.msg(chan, "\x034no, %s, you are a wrong dong!!! please try again..." % nick)
 			self.gamestats["guesses"]+=1
 			if nick not in tuple(self.gamestats["scoreboard"]):
-				self.gamestats["scoreboard"][nick] = {"wins" : 0, "games" : 1, "+" : 0, "-" : 0}	
+				self.gamestats["scoreboard"][nick] = {"wins" : 0, "games" : 0, "+" : 0, "-" : 0}	
 			if nick not in self.gamestats["players"]:
 				self.gamestats["players"].append(nick)
 				self.gamestats["scoreboard"][nick]["games"]+=1
@@ -414,6 +415,7 @@ class Bot:
 		plus, minus = 0, 0
 		print "$$tag attempt!!"
 		for t in tags:
+
 			if t == "pantsu": t = "panties"
 			print t
 			self.gamestats["tag_guesses"]+=1
@@ -431,17 +433,17 @@ class Bot:
 					minus += 1
 					
 				else: self.msg(chan, "\x034 %s was already guessed" % t)
-			
+		
+			if nick not in tuple(self.gamestats["scoreboard"]):
+				self.gamestats["scoreboard"][nick] = {"wins" : 0, "games" : 0, "+" : plus, "-" : minus}			
+		
 			if nick not in self.gamestats["players"]:
 				self.gamestats["players"].append(nick)
 				self.gamestats["scoreboard"][nick]["games"]+=1
-				
-			if nick not in tuple(self.gamestats["scoreboard"]):
-				self.gamestats["scoreboard"][nick] = {"wins" : 0, "games" : 1, "+" : plus, "-" : minus}
-				
-			else:
-				if plus: self.gamestats["scoreboard"][nick]["+"]+=plus  
-				if minus: self.gamestats["scoreboard"][nick]["-"]+=minus
+						
+			
+			if plus: self.gamestats["scoreboard"][nick]["+"]+=plus  
+			if minus: self.gamestats["scoreboard"][nick]["-"]+=minus
 			
 			#self.msg(chan, "\x032taglist: %s" % (" ".join(self.gamestats["current_tags"])))
 			print self.gamestats["current_tags"]
