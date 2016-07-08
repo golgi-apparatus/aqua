@@ -78,6 +78,14 @@ class GelbooruScraper(Scraper):
 		c["total_resluts"] = self.MAXGEL
 		return c
 		
+	def get_tags(self, id):
+		api_link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index&id=%s" %(random.randint(0, self.MAXGEL))
+		xmlstr = requests.get(api_link).text
+		root = xtree.fromstring(xmlstr)
+		if root.attrib["count"] == "0": return None
+		for child in root:
+			taggo = child.attrib["tags"]
+		return taggo
 			
 	def link(self, id):
 		return "http://gelbooru.com/index.php?page=post&s=view&id=%s" % id 

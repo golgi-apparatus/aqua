@@ -40,7 +40,7 @@ class Bot:
 			"gelbooru" : scraper.GelbooruScraper()
 			#"pixiv"    : scraper.PixivScraper(username="aquachansama",password="aquaisthebest")
 		}
-		
+		self.currtags = (None, None)
 		self.pingable = True
 		
 		# game stats
@@ -74,6 +74,7 @@ class Bot:
 			"?gpron" : self.gpron,
 			"?glewd" : self.glewd,
 			"?wallpaper" : self.wallpaper,
+			"?tags" : self.tags,
 			
 			"?megumi" : self.megumi,
 			"?me"  : self.aqua,
@@ -212,8 +213,19 @@ class Bot:
 	
 	def linker(self, tags, scr, err="stop looking up ecchi you...you...h-h-hentai!!!!!!", n="", mode="scrape"):
 		c = scr.scrape(tags) if mode == "scrape" else scr.random(())
-		return ("%s, page link: %s \x037 src link: %s \x033total: %i\x038 posted: %s  \x034id: %s \x032tags: %s " %(n, linkshort.isgd_short(scr.link(c['id'])), c["file_url"], c["total_resluts"], c["created_at"], c["id"], c["tags"])) if c else err
+		#return ("%s, page link: %s \x037 src link: %s \x033total: %i\x038 posted: %s  \x034id: %s \x032tags: %s " %(n, linkshort.isgd_short(scr.link(c['id'])), c["file_url"], c["total_resluts"], c["created_at"], c["id"], c["tags"])) if c else err
+		if not c: return err
+		self.currtags = (c["id"], c["tags"])
+		return ("%s, page link: %s \x037 src link: %s \x033total: %i\x038 posted: %s  \x034id: %s \x032 rating: %s" %(n, scr.link(c['id']), c["file_url"], c["total_resluts"], c["created_at"], c["id"], {"s":"safe", "q": "questionable", "e":"explicit"}[c["rating"]]))
 
+	def tags(self, chan, id, nick):
+		if id:
+			idd = id[0]
+			c = self.scrapers["gelbooru"].get_tags(idd) # generalize this later
+			self.msg(chan, "tags for %s: %s" % (idd, c))
+		else:
+			self.msg(chan, "tags for %s: %s" % (self.currtags[0], self.currtags[1]))
+		
 	def randpix(self, chan, dum, nick):
 		g =  self.linker((), n=nick, scr=choicedict(self.scrapers), mode="random")
 		self.msg(chan, g)
@@ -308,7 +320,7 @@ class Bot:
 
 	def fozrucix(self, chan, dum, nick):
 		self.msg(chan, "this is fozrucix-kun!! he is actually a computer! he can process cool fucking jengascript commands! also he has a q timer and posts website link metadata! also he is a FUCKING ASSHOLE!!!!!!!! so he can tell u if anything is bullshit")
-		self.gel(chan, ["computer"], nick)
+		self.gel(chan, ["computer", "|", "burgerpants"], nick)
 		
 	def saveybot(self, chan, dum, nick):
 		self.msg(chan, "this is saveybot! he is the original bot... he can save cool things u type with the .save command! people like to chain him up for some reason..... 8=======D")
