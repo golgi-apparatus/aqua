@@ -188,11 +188,11 @@ class Bot:
 				break
 				
 		if chan not in self.logs: self.logs[chan] = Log("logs/%s.log" %(chan))
-		content = " ".join(argss[3:])
+		content = " ".join(argss[3:])[1:]
 		
 		if argss[1] == "PRIVMSG": self.logs[chan].write(nn, content)
 		elif argss[1] == "NICK": self.logs[chan].nick(nn, content)
-		elif argss[1] == "JOIN": self.logs[chan].join(content)
+		elif argss[1] == "JOIN": self.logs[chan].join(nn)
 		elif argss[1] == "QUIT": self.logs[chan].quit(nn, content)
 		elif argss[1] == "PART": self.logs[chan].leave(nn, content)
 		else: self.logs[chan].raw(data)
