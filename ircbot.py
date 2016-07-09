@@ -14,6 +14,7 @@ import random
 ### aqua libs
 import linkshort
 import scraper
+from log import Log
 
 ## helper
 def choicedict(dic):
@@ -42,6 +43,7 @@ class Bot:
 		}
 		self.currtags = (None, None)
 		self.pingable = True
+		self.logs = {}
 		
 		# game stats
 		self.game_on = False
@@ -167,21 +169,41 @@ class Bot:
 
 		no_colon = [s.replace(":","") for s in argss]
 		print argss
-			
+		
+		
+		nn = argss[0][1:argss[0].find("!")] 
+		chan = argss[0][1:argss[0].find("!")] if argss[2] == self.nick else argss[2]
+		
 		for key in self.cmdy:
 			if key in no_colon: 
 				chan = argss[0][1:argss[0].find("!")] if argss[2] == self.nick else argss[2]
-				nn = argss[0][1:argss[0].find("!")] 
 				pa = self.parse_args(key, argss)
 				print pa
 				self.cmdy[key](chan, pa, nn)
 				return
 	
-	
+		for c in '/:*?"<>|\\': # lol gay
+			if c in chan:
+				chan = "__home__"
+				break
+				
+		if chan not in self.logs: self.logs[chan] = Log("logs/%s.log" %(chan))
+		content = " ".join(argss[3:])
+		
+		if argss[1] == "PRIVMSG": self.logs[chan].write(nn, content)
+		elif argss[1] == "NICK": self.logs[chan].nick(nn, content)
+		elif argss[1] == "JOIN": self.logs[chan].join(content)
+		elif argss[1] == "QUIT": self.logs[chan].quit(nn, content)
+		elif argss[1] == "PART": self.logs[chan].leave(nn, content)
+		else: self.logs[chan].raw(data)
+		
 	def msg(self, chan, send):
 		print chan
-		print "PRIVMSG %s :%s\r\n" %(chan,send)
-		self.irc.send("PRIVMSG %s :%s\r\n" %(chan,send))	
+		mm = "PRIVMSG %s :%s\r\n" %(chan,send)
+		print mm
+		self.irc.send(mm)
+		if chan not in self.logs: self.logs[chan] = Log("logs/%s.log" %(chan))
+		self.logs[chan].write(self.nick, send)
 	
 	def send_raw(self, send):
 		print send
