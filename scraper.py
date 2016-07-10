@@ -79,7 +79,8 @@ class GelbooruScraper(Scraper):
 		return c
 		
 	def get_tags(self, id):
-		api_link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index&id=%s" %(random.randint(0, self.MAXGEL))
+		if(not id.isdigit()): return None
+		api_link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index&id=%s" %(id)
 		xmlstr = requests.get(api_link).text
 		root = xtree.fromstring(xmlstr)
 		if root.attrib["count"] == "0": return None

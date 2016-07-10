@@ -248,7 +248,7 @@ class Bot:
 		if id:
 			idd = id[0]
 			c = self.scrapers["gelbooru"].get_tags(idd) # generalize this later
-			self.msg(chan, "tags for %s: %s" % (idd, c))
+			self.msg(chan, "tags for %s: %s" % (idd, c) if c else  "tags error! please put a valid id number in the argument!")
 		else:
 			self.msg(chan, "tags for %s: %s" % (self.currtags[0], self.currtags[1]))
 		
