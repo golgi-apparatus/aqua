@@ -162,6 +162,9 @@ class Bot:
 	
 	def process_data(self, data):
 		argss = data.split()
+		if argss[0] == "PING": # don't do all the rest if it's just a ping wow exception master
+			return
+		
 		exc, att = argss[0].find("!"), argss[0].find("@")
 		self.user["nick"] = argss[0][1:exc] 
 		self.user["ident"] = argss[0][exc:att] 
@@ -188,12 +191,13 @@ class Bot:
 				break
 				
 		if chan not in self.logs: self.logs[chan] = Log("logs/%s.log" %(chan))
-		content = " ".join(argss[3:])[1:]
+		if (len(argss) > 3): content = " ".join(argss[3:])[1:]
+		if (len(argss) > 2): a2 = " ".join(argss[2:])[1:][1:]
 		
 		if argss[1] == "PRIVMSG": self.logs[chan].write(nn, content)
-		elif argss[1] == "NICK": self.logs[chan].nick(nn, content)
+		elif argss[1] == "NICK": self.logs[chan].nick(nn, a2)
 		elif argss[1] == "JOIN": self.logs[chan].join(nn)
-		elif argss[1] == "QUIT": self.logs[chan].quit(nn, content)
+		elif argss[1] == "QUIT": self.logs[chan].quit(nn, a2)
 		elif argss[1] == "PART": self.logs[chan].leave(nn, content)
 		else: self.logs[chan].raw(data)
 		
