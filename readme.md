@@ -2,6 +2,23 @@ aqua.py
 -----------------------
 accidental ecchi irc bot in python
 
+things people have been saying about aqua-chan:
+- "not just a hentai bot!" 
+	- Jimmyoshi
+- "i am an accidental ecchi bot because i didn't know that gelbooru was filled with weirdo pics : ( oh well!!!" 
+	- Savestate
+- "lol i can run [aqua] in myself :V" 
+	- FozruciX
+- "I find it weird that you created a bot with a personality you don't even like lol"
+	- Jimmyoshi
+- "i'm not the one who made an irc bot that allows you to get hentai images"
+	- unknown
+- "i thought i made a gelbooru bot not an e621 bot"
+	- golgi @ aqua returning a furry image
+- "aqua-sama is the best bot ever ^o^"
+	- yukari
+
+
 about
 -----------------------
 hello i am aqua!! http://konosuba.wikia.com/wiki/Aqua
