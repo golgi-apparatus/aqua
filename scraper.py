@@ -3,8 +3,9 @@ import requests
 #from requests_oauthlib import OAuth1
 import xml.etree.ElementTree as xtree
 import random
+from time import sleep
 
-# tag parsing helper function
+# tag parsing helper function (this code SUCKS!!!!!!!!!!!!!!!!!!!!)
 def tag_parser(tags):
 	tlen = len(tags)
 	newtags = []
@@ -36,8 +37,14 @@ class GelbooruScraper(Scraper):
 	MAXGEL = 3000000
 	def __init__(self):
 		print "init gelbooru..."
-		gel_home = "http://gelbooru.com/index.php?page=dapi&s=post&q=index"
-		xmlstr = requests.get(gel_home).text
+		link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index"
+		try:
+			xmlstr = requests.get(link).text
+		except:
+			print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
+			sleep(1)
+			xmlstr = requests.get(link).text
+			
 		root = xtree.fromstring(xmlstr)
 		self.MAXGEL = int(root.attrib["count"])
 		print self.MAXGEL
@@ -50,7 +57,13 @@ class GelbooruScraper(Scraper):
 		for t in tags:
 			link+=(t+"+")
 
-		xmlstr = requests.get(link).text
+		try:
+			xmlstr = requests.get(link).text
+		except:
+			print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
+			sleep(1)
+			xmlstr = requests.get(link).text
+			
 		root = xtree.fromstring(xmlstr)
 		total = int(root.attrib["count"])
 		if total < 1: return {}
@@ -64,8 +77,13 @@ class GelbooruScraper(Scraper):
 		return cc
 		
 	def random(self, tags):
-		api_link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index&id=%s" %(random.randint(0, self.MAXGEL))
-		xmlstr = requests.get(api_link).text
+		link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index&id=%s" %(random.randint(0, self.MAXGEL))
+		try:
+			xmlstr = requests.get(link).text
+		except:
+			print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
+			sleep(1)
+			xmlstr = requests.get(link).text
 		root = xtree.fromstring(xmlstr)
 		gay = []
 		for child in root:
@@ -81,7 +99,14 @@ class GelbooruScraper(Scraper):
 	def get_tags(self, id):
 		if(not id.isdigit()): return None
 		api_link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index&id=%s" %(id)
-		xmlstr = requests.get(api_link).text
+		try:
+			xmlstr = requests.get(link).text
+		except:
+			print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
+			sleep(1)
+			xmlstr = requests.get(link).text
+			
+			
 		root = xtree.fromstring(xmlstr)
 		if root.attrib["count"] == "0": return None
 		for child in root:
