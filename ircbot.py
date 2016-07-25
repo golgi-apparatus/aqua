@@ -8,13 +8,15 @@ sys.setdefaultencoding('utf8')
 ### external libs
 import socket
 from threading import Thread
-from time import sleep
+from time import sleep, time
 import random
+import requests
 
 ### aqua libs
 import linkshort
 import scraper
 from log import Log
+
 
 ## helper
 def choicedict(dic):
@@ -26,6 +28,22 @@ def searchkey(diclist, k, v):
 			return i
 	
 	return None
+	
+def ping_url(url):
+	try:
+		t0 = time()
+		requests.get(url)
+		t1 = time()
+		
+	except:
+		print "cockblocked!!!!!!!!!!! : (("
+		sleep(1)
+		t0 = time()
+		requests.get(url)
+		t1 = time()
+		
+	return (t1-t0)*1000
+	
 ## bot
 class Bot:
 	# main functions 
@@ -71,6 +89,7 @@ class Bot:
 			
 			"?gay" : self.gel_rand,
 			"?gel" : self.gel,
+			"?gelping": self.gelping,
 			"?gsfw" : self.gsfw,
 			"?gsafe" : self.gsafe,
 			"?gpron" : self.gpron,
@@ -84,6 +103,7 @@ class Bot:
 			"?fozrucix" : self.fozrucix,
 			"?saveybot" : self.saveybot,
 			"?ayumi" : self.ayumi,
+			"?regume" : self.regume,
 			"?neko" : self.neko,
 			
 			"?help" : self.help,
@@ -102,7 +122,7 @@ class Bot:
 		}
 			
 	def connect(self):
-		self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.irc = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 		self.irc.settimeout(300)
 		print "setting up irc socket...  %s %i" %(self.network, self.port)
 		self.irc.connect( (self.network, self.port) )
@@ -115,6 +135,9 @@ class Bot:
 		self.data = self.irc.recv(4096)
 		if self.data.find ('PING') != -1:
 			self.irc.send ('PONG ' + self.data.split()[1] + '\r\n')
+		for chan in self.channels:
+			self.irc.send("\r\nJOIN " +chan+ "\r\n")
+			print "\r\nJOIN " +chan+ "\r\n"		
 		#print 'PONG ' + self.data.split() [ 1 ] + '\r\n'
 		
 
@@ -138,18 +161,19 @@ class Bot:
 			data = self.irc.recv(4096)
 			if data.find ('PING') != -1:
 				self.irc.send ('PONG ' + data.split()[1] + '\r\n')
-			
-			for chan in self.channels:
-				self.irc.send("\r\nJOIN " +chan+ "\r\n")
-				print "\r\nJOIN " +chan+ "\r\n"		
+				for chan in self.channels:
+					self.irc.send("\r\nJOIN " +chan+ "\r\n")
+					print "\r\nJOIN " +chan+ "\r\n"		
 				
 			return data
 			
 		except socket.error:
 			print "::::::::: ((((((((((((((( socket fail"
+			self.pingable = False
 			sys.exit(2506)
 		except socket.timeout:
 			print "TTTTTTTTTTTTTTTTTT socket timeout"
+			self.pingable = False
 			sys.exit(2507)
 	
 	def join(self, chan):
@@ -290,7 +314,14 @@ class Bot:
 		g =  self.linker((), n=nick, scr=self.scrapers["gelbooru"], mode="random")
 		self.msg(chan, g)
 	
-	
+	def gelping(self, chan, dum, nick):
+		api_link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index"
+		best = ping_url(api_link)
+		print best
+		worst = ping_url(api_link+"&pid=%i" % (self.scrapers["gelbooru"].MAXGEL/100 - 1))
+		print worst
+		self.msg(chan, "%s here is my current gelbooru ping!! best=%ims worst=%ims" % (nick, best, worst))
+		
 	def gel(self, chan, tags, nick):
 		m = self.linker(tags, err="%s, stop looking up ecchi you...you...h-h-hentai!!!!!!" % nick, n=nick, scr=self.scrapers["gelbooru"], mode="scrape" if tags else "random")
 		if m: self.msg(chan, m)
@@ -351,6 +382,10 @@ class Bot:
 	def saveybot(self, chan, dum, nick):
 		self.msg(chan, "this is saveybot! he is the original bot... he can save cool things u type with the .save command! people like to chain him up for some reason..... 8=======D")
 		self.gel(chan, ["chains"], nick)
+		
+	def regume(self, chan, dum, nick):
+		self.msg(chan, "this is regume-chan! she is very outgoing and conversational and fun to talk to! ping her with a topic of your choice and she'll respond to you!")
+		self.gel(chan, ["id:2616196"], nick)
 
 		
 		

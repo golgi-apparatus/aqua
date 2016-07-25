@@ -17,6 +17,10 @@ things people have been saying about aqua-chan:
 	- golgi @ aqua returning a furry image
 - "aqua-sama is the best bot ever ^o^"
 	- yukari
+- "?scoreboard ?scoreboard ?scoreboard regume"
+	- yuki-chan
+- "37:04] <yukari> aqua-sama is extremely legal."
+	- regume-chan
 
 
 about
@@ -60,6 +64,7 @@ here is what i can do!!
 	?gpron <tags>		link a (explicit!) random picture in <tags> from gelbooru (wow why would you even use this wtf?????)
 	?wallpaper <tags>	link a wallpaper spec (highres | absurdres) picture in <tags> from gelbooru
 	?tags <id>			return the tags for the specified gelbooru id. if id is blank, returns the tags for the previously linked image
+	?gelping			return the best ping time (first page) and worst ping time (last page because it's old) 
 	
 	~~ you can also prepend your tags with - if you DON'T want to see that tag (for example if you only want anime pix and no photos, put -photo as one of the tags)
 	~~ gelbooru has some neat features for tags!! check them out here http://gelbooru.com/index.php?page=help&topic=cheatsheet (~pre does not work)
