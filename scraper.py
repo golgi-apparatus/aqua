@@ -1,9 +1,12 @@
+#!/usr/bin/env python
+# encoding=utf8  
 import sys
 import requests
 #from requests_oauthlib import OAuth1
 import xml.etree.ElementTree as xtree
 import random
 from time import sleep
+from aqua_utils import plog, main_log
 
 # tag parsing helper function (this code SUCKS!!!!!!!!!!!!!!!!!!!!)
 def tag_parser(tags):
@@ -27,7 +30,7 @@ def tag_parser(tags):
 def getcatch(url):
 	try: return requests.get(url).text
 	except:
-		print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
+		plog(main_log, "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!")
 		sleep(1)
 		return requests.get(url).text	
 
@@ -45,12 +48,12 @@ class Scraper:
 class GelbooruScraper(Scraper):
 	MAXGEL = 3000000
 	def __init__(self):
-		print "init gelbooru..."
+		plog(main_log, "init gelbooru...")
 		link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index"
 		xmlstr = getcatch(link)
 		root = xtree.fromstring(xmlstr)
 		self.MAXGEL = int(root.attrib["count"])
-		print self.MAXGEL
+		plog(main_log, str(self.MAXGEL))
 		
 	def scrape(self, tags):
 		tags = tag_parser(tags)

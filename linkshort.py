@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# encoding=utf8  
 import urllib2, json, urllib
 def waaai_short(url):
 	wurl = 'http://api.waa.ai/shorten?url=%s' % url 

@@ -16,7 +16,7 @@ import requests
 import linkshort
 import scraper
 from log import Log
-
+from aqua_utils import plog, main_log
 
 ## helper
 
@@ -37,7 +37,7 @@ def ping_url(url):
 		t1 = time()
 		
 	except:
-		print "cockblocked!!!!!!!!!!! : (("
+		plog(main_log, "cockblocked!!!!!!!!!!! : ((")
 		sleep(1)
 		t0 = time()
 		requests.get(url)
@@ -132,15 +132,15 @@ class Bot:
 	### main irc actions
 	
 	def msg(self, chan, send):
-		print chan
+		plog(main_log, chan)
 		mm = "PRIVMSG %s :%s\r\n" %(chan,send)
-		print mm
+		plog(main_log, mm)
 		self.irc.send(mm)
 		if chan not in self.logs: self.logs[chan] = Log("logs/%s.log" %(chan))
 		self.logs[chan].write(self.nick, send)
 	
 	def send_raw(self, send):
-		print send
+		plog(main_log, send)
 		self.irc.send(send)
 		
 	def join(self, chan):
@@ -148,12 +148,12 @@ class Bot:
 		self.channels.append(chan)
 		for c in self.channels:
 			self.irc.send("\r\nJOIN " +c+ "\r\n")
-			print "\r\nJOIN " +c+ "\r\n"				
+			plog(main_log, "\r\nJOIN " +c+ "\r\n")			
 			
 	def leave(self, chan):
 		if chan not in self.channels: return
 		self.irc.send("\r\nPART "+chan+" i am too holy for this channel!"+"\r\n")
-		print "\r\nPART"+chan+" i am too holy for this channel!"+"\r\n"
+		plog(main_log, "\r\nPART"+chan+" i am too holy for this channel!"+"\r\n")
 		self.channels.remove(chan)
 
 	def quit(self, code): # code decides whether to reconnect or not
@@ -168,30 +168,30 @@ class Bot:
 	def connect(self):
 		self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.irc.settimeout(300)
-		print "setting up irc socket...  %s %i" %(self.network, self.port)
+		plog(main_log, "setting up irc socket...  %s %i" %(self.network, self.port))
 		self.irc.connect( (self.network, self.port) )
-		print "connecting to irc..."
-		print "sending nick info...NICK %s\r\n" %(self.nick)
+		plog(main_log, "connecting to irc...")
+		plog(main_log, "sending nick info...NICK %s\r\n" %(self.nick))
 		self.irc.send("NICK %s\r\n" %(self.nick))
-		print "sending user info...USER %s %s %s :%s\r\n" %(self.ident, self.ident, self.ident, self.ident)
+		plog(main_log, "sending user info...USER %s %s %s :%s\r\n" %(self.ident, self.ident, self.ident, self.ident))
 		self.irc.send("USER %s %s %s :%s\r\n" %(self.ident, self.ident, self.ident, self.ident))
-		print "pinging!!!"
+		plog(main_log, "pinging!!!")
 		self.data = self.irc.recv(4096)
 		if self.data.find ('PING') != -1:
 			self.irc.send ('PONG ' + self.data.split()[1] + '\r\n')
 		for chan in self.channels:
 			self.irc.send("\r\nJOIN " +chan+ "\r\n")
-			print "\r\nJOIN " +chan+ "\r\n"		
-		#print 'PONG ' + self.data.split()[1] + '\r\n'
+			plog(main_log, "\r\nJOIN " +chan+ "\r\n")
+		#plog(main_log, 'PONG ' + self.data.split()[1] + '\r\n'
 		self.pingable = True
 		return True
 
 	def parse_args(self, a, dat):
 		if not self.pingable: return ()
-		print "parsing some args!"
+		plog(main_log, "parsing some args!")
 		datt = dat
 		while (datt[0].replace(":","")) != a:
-			print str(datt)+" "+a
+			plog(main_log, str(datt)+" "+a)
 			datt.pop(0)
 		datt.pop(0)
 		return datt
@@ -205,16 +205,16 @@ class Bot:
 				self.irc.send ('PONG ' + data.split()[1] + '\r\n')
 				for chan in self.channels:
 					self.irc.send("\r\nJOIN " +chan+ "\r\n")
-					print "\r\nJOIN " +chan+ "\r\n"		
+					plog(main_log, "\r\nJOIN " +chan+ "\r\n")	
 				
 			return data
 			
 		except socket.error:
-			print "::::::::: ((((((((((((((( socket fail"
+			plog(main_log, "::::::::: ((((((((((((((( socket fail")
 			self.pingable = False
 			sys.exit(2506)
 		except socket.timeout:
-			print "TTTTTTTTTTTTTTTTTT socket timeout"
+			plog(main_log, "TTTTTTTTTTTTTTTTTT socket timeout")
 			self.pingable = False
 			sys.exit(2507)
 	
@@ -229,7 +229,7 @@ class Bot:
 		self.user["host"] = argss[0][att:-1] 
 
 		no_colon = [s.replace(":","") for s in argss]
-		print argss
+		plog(main_log, str(argss))
 		
 		
 		nn = argss[0][1:argss[0].find("!")] 
@@ -239,7 +239,7 @@ class Bot:
 			if key in no_colon: 
 				chan = argss[0][1:argss[0].find("!")] if argss[2] == self.nick else argss[2]
 				pa = self.parse_args(key, argss)
-				print pa
+				plog(main_log, str(pa))
 				self.cmdy[key](chan, pa, nn)
 				return
 	
@@ -331,9 +331,9 @@ class Bot:
 	def gelping(self, chan, dum, nick):
 		api_link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index"
 		best = ping_url(api_link)
-		print best
+		plog(main_log, str(best))
 		worst = ping_url(api_link+"&pid=%i" % (self.scrapers["gelbooru"].MAXGEL/100 - 1))
-		print worst
+		plog(main_log, str(worst))
 		self.msg(chan, "%s here is my current gelbooru ping!! best=%ims worst=%ims" % (nick, best, worst))
 		
 	def gel(self, chan, tags, nick):
@@ -411,7 +411,7 @@ class Bot:
 		rates = {"s":"rating:safe", "q":"rating:questionable", "e":"rating:explicit"}
 		# start a new game!!
 		self.gamestats["current_tags"] = tags
-		print tags
+		plog(main_log, str(tags))
 		
 		self.msg(chan, "starting the game!!! please wait about 30 seconds.... looking for a pic in %s" % self.gamestats["current_tags"])
 		if mode: tags.append(rates[random.choice(mode)])
@@ -441,7 +441,7 @@ class Bot:
 		self.gamestats["gel_link"] = "http://www.gelbooru.com/index.php?page=post&s=view&id=%s" % self.gamestats["id"]
 		self.msg(chan, "\x034helo gays!! it is time to play gelgame! this version of gelgame is: %s. guess a $tag to get some hints at what the pic is or guess the $pic id number or link to try to guess the picture!!" % mode)
 		self.game_on = True
-		print self.gamestats
+		plog(main_log, str(self.gamestats))
 		
 		
 	def gelgame_guess(self, chan, guess, nick):
@@ -449,7 +449,7 @@ class Bot:
 			if not self.pingable: self.msg(chan, "hey there is no gay going on!! start one with $gelgame, $gelgame_safe, $gelgame_lewd, $gelgame_sfw, or $gelgame_pron!!")
 			return
 			
-		print "$$pic attempt!!!"
+		plog(main_log, "$$pic attempt!!!")
 		if not guess: return
 		self.gamestats["current_guess"] = guess[0][guess[0].rfind("=")+1:]
 		
@@ -464,7 +464,7 @@ class Bot:
 				self.gamestats["scoreboard"][nick]["wins"]+=1
 			
 			scores = sorted( ((v["wins"], k, v) for k, v in self.gamestats["scoreboard"].iteritems()), reverse=True) # babby's first generator expression and also lambda (oh no)
-			print scores
+			plog(main_log, str(scores))
 			with open("scoreboard.sc", "w") as sc:
 				for s in scores:
 					sc.write("%s %i %i %i %i\n" % (s[1], s[0], s[2]["games"], s[2]["+"], s[2]["-"]))
@@ -479,20 +479,18 @@ class Bot:
 			if nick not in self.gamestats["players"]:
 				self.gamestats["players"].append(nick)
 				self.gamestats["scoreboard"][nick]["games"]+=1
-						
-				
-		print self.gamestats
+		plog(main_log, str(self.gamestats))
 		
 	def gelgame_tag(self, chan, tags, nick):
 		if not self.game_on:
 			if not self.pingable: self.msg(chan, "hey there is no gay going on!! start one with $gelgame, $gelgame_safe, $gelgame_lewd, $gelgame_sfw, or $gelgame_pron!!")
 			return
 		plus, minus = 0, 0
-		print "$$tag attempt!!"
+		plog(main_log, "$$tag attempt!!")
 		for t in tags:
 
 			if t == "pantsu": t = "panties"
-			print t
+			plog(main_log, t)
 			self.gamestats["tag_guesses"]+=1
 			if t in self.gamestats["tags"] and t not in self.gamestats["current_tags"]:
 				self.msg(chan, "nice!! %s is one of the tags!!" % t)
@@ -521,12 +519,12 @@ class Bot:
 			if minus: self.gamestats["scoreboard"][nick]["-"]+=minus
 			
 			#self.msg(chan, "\x032taglist: %s" % (" ".join(self.gamestats["current_tags"])))
-			print self.gamestats["current_tags"]
+			plog(main_log, str(self.gamestats)["current_tags"])
 			gel_url = "http://www.gelbooru.com/index.php?page=post&s=list&tags=%s" %("+".join(self.gamestats["current_tags"]))
-			print gel_url
+			plog(main_log, gel_url)
 			self.msg(chan, "\x032taglink: %s" % (linkshort.isgd_short(gel_url)))
 		
-		print self.gamestats
+		plog(main_log, str(self.gamestats))
 		
 	def game(self, chan, tags, nick):
 		gt = Thread(target=self.gelgame, args=(chan, tags,""))
@@ -561,18 +559,18 @@ class Bot:
 	
 	# maybe you will figure out how to compromise aqua??? lol good luck~
 	def admin(self, chan, tags, nick):
-		print "!!!admin!!!"
+		plog(main_log, "!!!admin!!!")
 		if not tags: return
-		print tags
+		plog(main_log, str(tags))
 		if tags[0] == "msg" and tags[2]:
 			self.msg(tags[1], " ".join(tags[2:]))
 				
 		elif tags[0] == "join" and tags[1]:
-			print tags[1:]
+			plog(main_log, str(tags)[1:])
 			for t in tags[1:]: self.join(t)
 			
 		elif tags[0] == "leave" and tags[1]:
-			print tags[1:]
+			plog(main_log, str(tags)[1:])
 			for t in tags[1:]: self.leave(t)
 		
 		elif tags[0] == "quit":

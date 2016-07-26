@@ -11,6 +11,7 @@ from threading import Thread
 
 ### aqua libs
 import ircbot
+from aqua_utils import plog, main_log
 
 def pinger(bot):
 	pingas = []
@@ -29,8 +30,8 @@ if __name__ == "__main__":
 	aqua = ircbot.Bot("aqua-sama", "irc.esper.net", 6667, chans, "mizu-chan", ctl)
 	
 	if(not aqua.connect()):
-		print "epic fail : ("
+		plog(main_log, "epic fail : (")
 		quit()
-	print "starting!!!"
+	plog(main_log, "starting!!!")
 	
 	while aqua.qcode == aqua.RECONNECT: pinger(aqua)

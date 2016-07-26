@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# encoding=utf8  
 import re, requests
 
 ## returns the string between two keywords in s 
@@ -9,10 +11,6 @@ def finder(s, beg, end, fromloc=0):
 ## split() but returns an iterator instead of a list
 def isplit(string):
     return (x.group(0) for x in re.finditer(r"[A-Za-z']+", string))
-
-def tagstofile(dic, fn):
-	with open(fn, "w") as f:
-		for k, v in dic.iteritems():
 			f.write("%s %s\n" % (k, v))
 
 def generate_taglist(filewrite=False, fn="gelbooru_tags.txt"):
