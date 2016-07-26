@@ -69,6 +69,7 @@ class Bot:
 		
 		# game stats
 		self.game_on = False
+		self.can_scoreboard = True
 		self.gamestats = {  
 			"id" : "0",
 			"guesses" : 0,
@@ -166,7 +167,7 @@ class Bot:
 	## aqua utilities
 	
 	def connect(self):
-		self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.irc = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
 		self.irc.settimeout(300)
 		plog(main_log, "setting up irc socket...  %s %i" %(self.network, self.port))
 		self.irc.connect( (self.network, self.port) )
@@ -197,10 +198,12 @@ class Bot:
 		return datt
 	
 	def ping(self):
+		self.irc.setblocking(1)
 		try:
 			if not self.pingable: 
 				return
 			data = self.irc.recv(4096)
+			self.irc.setblocking(0)
 			if data.find ('PING') != -1:
 				self.irc.send ('PONG ' + data.split()[1] + '\r\n')
 				for chan in self.channels:
@@ -547,15 +550,18 @@ class Bot:
 		gt.start()	
 	
 	def gelgame_scoreboard(self, chan, tags, nick):
-		with open("scoreboard.sc", "r") as sc:
-			i = 1
-			self.msg(chan, "------------------------------")
-			self.msg(chan, "| gelgame scoreboard")
-			for line in sc:
-				l = line.split()
-				self.msg(chan, "| %i) %s: %s wins/%s games ( +%s -%s )" %(i, l[0], l[1], l[2], l[3], l[4]))
-				i+=1
-			self.msg(chan, "------------------------------")
+		if self.can_scoreboard:
+			self.can_scoreboard = False
+			with open("scoreboard.sc", "r") as sc:
+				i = 1
+				self.msg(chan, "------------------------------")
+				self.msg(chan, "| gelgame scoreboard")
+				for line in sc:
+					l = line.split()
+					self.msg(chan, "| %i) %s: %s wins/%s games ( +%s -%s )" %(i, l[0], l[1], l[2], l[3], l[4]))
+					i+=1
+				self.msg(chan, "------------------------------")
+			self.can_scoreboard = True
 	
 	# maybe you will figure out how to compromise aqua??? lol good luck~
 	def admin(self, chan, tags, nick):
