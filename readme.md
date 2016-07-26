@@ -82,6 +82,7 @@ here is what i can do!!
 	?fozrucix			show a random picture of a computer
 	?ayumi				show a random picture of otosaka ayumi
 	?saveybot			show a random picture of chains
+	?regume				shows regume-chan on a legume
 	?neko				show a random neko
 	
 	
