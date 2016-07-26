@@ -256,7 +256,7 @@ class Bot:
 		elif argss[1] == "NICK": self.logs[chan].nick(nn, a2)
 		elif argss[1] == "JOIN": self.logs[chan].join(nn)
 		elif argss[1] == "QUIT": self.logs[chan].self.QUIT(nn, a2)
-		elif argss[1] == "PART": self.logs[chan].leave(nn, content)
+		elif argss[1] == "PART": self.logs[chan].leave(nn, a2)
 		else: self.logs[chan].raw(data)
 	
 	## command functions
