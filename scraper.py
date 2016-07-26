@@ -22,6 +22,15 @@ def tag_parser(tags):
 
 	return {}.fromkeys(newtags).keys()
 
+	
+# get w/ exception handling
+def getcatch(url):
+	try: return requests.get(url).text
+	except:
+		print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
+		sleep(1)
+		return requests.get(link).text	
+
 # scraper classes
 
 class Scraper:
@@ -38,13 +47,7 @@ class GelbooruScraper(Scraper):
 	def __init__(self):
 		print "init gelbooru..."
 		link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index"
-		try:
-			xmlstr = requests.get(link).text
-		except:
-			print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
-			sleep(1)
-			xmlstr = requests.get(link).text
-			
+		xmlstr = getcatch(link)
 		root = xtree.fromstring(xmlstr)
 		self.MAXGEL = int(root.attrib["count"])
 		print self.MAXGEL
@@ -57,19 +60,14 @@ class GelbooruScraper(Scraper):
 		for t in tags:
 			link+=(t+"+")
 
-		try:
-			xmlstr = requests.get(link).text
-		except:
-			print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
-			sleep(1)
-			xmlstr = requests.get(link).text
+		xmlstr = getcatch(link)
 			
 		root = xtree.fromstring(xmlstr)
 		total = int(root.attrib["count"])
 		if total < 1: return {}
 		start = random.randint(0, total/100)
 		link+="&pid=%i" %(start)
-		xmlstr = requests.get(link).text
+		xmlstr = getcatch(link)
 		root = xtree.fromstring(xmlstr)
 		
 		cc = random.choice(root).attrib
@@ -78,12 +76,7 @@ class GelbooruScraper(Scraper):
 		
 	def random(self, tags):
 		link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index&id=%s" %(random.randint(0, self.MAXGEL))
-		try:
-			xmlstr = requests.get(link).text
-		except:
-			print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
-			sleep(1)
-			xmlstr = requests.get(link).text
+		xmlstr = getcatch(link)
 		root = xtree.fromstring(xmlstr)
 		gay = []
 		for child in root:
@@ -99,14 +92,8 @@ class GelbooruScraper(Scraper):
 	def get_tags(self, id):
 		if(not id.isdigit()): return None
 		api_link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index&id=%s" %(id)
-		try:
-			xmlstr = requests.get(link).text
-		except:
-			print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
-			sleep(1)
-			xmlstr = requests.get(link).text
-			
-			
+		xmlstr = getcatch(link)
+				
 		root = xtree.fromstring(xmlstr)
 		if root.attrib["count"] == "0": return None
 		for child in root:
