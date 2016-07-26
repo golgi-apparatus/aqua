@@ -29,7 +29,7 @@ def getcatch(url):
 	except:
 		print "cockblocked wow!!!!!!!!!!!!!!!!!!!!!!!!!"
 		sleep(1)
-		return requests.get(link).text	
+		return requests.get(url).text	
 
 # scraper classes
 
