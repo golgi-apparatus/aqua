@@ -19,37 +19,18 @@ def pinger(bot):
 		pingas.append(Thread(target=bot.process_data, args=(pdat,)))
 		pingas[-1].start()
 		pingas = [t for t in pingas if t.is_alive()]
-			
-def sender(bot):
-	while bot.pingable:
-		m = raw_input("\t\tmsg> ")
-		if m == "/quit": 
-			bot.quit()
-			sys.exit(9002)
-		
-		if m == "/join":
-			c = raw_input("\t\t join which channel ?? > ")
-			bot.join(c)
-			
-		c = raw_input("\t\tchannel> ")
-		bot.msg(c, m)	
 
 
 if __name__ == "__main__":
 	chans = ["#savespam","#aquatest"]
-	aqua = ircbot.Bot("aqua-sama", "irc.esper.net", 6667, chans, "mizu-chan")
+	with open("aqua_controller", "r") as f:
+		ctl = f.read()
+		
+	aqua = ircbot.Bot("aqua-sama", "irc.esper.net", 6667, chans, "mizu-chan", ctl)
 	
 	if(not aqua.connect()):
 		print "epic fail : ("
 		quit()
+	print "starting!!!"
 	
-	print "starting the threads!!"
-	
-	pt = Thread(target=pinger, args=(aqua,))
-	st = Thread(target=sender, args=(aqua,))
-	
-	print "starting ping thread! %s" % pt.name
-	pt.start()
-	print "starting send thread! %s" % st.name
-	st.start()
-	
+	while aqua.qcode == aqua.RECONNECT: pinger(aqua)

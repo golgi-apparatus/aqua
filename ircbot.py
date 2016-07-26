@@ -19,6 +19,7 @@ from log import Log
 
 
 ## helper
+
 def choicedict(dic):
 	return random.choice(list(dic.values()))
 
@@ -45,10 +46,13 @@ def ping_url(url):
 	return (t1-t0)*1000
 	
 ## bot
+
 class Bot:
-	# main functions 
-	def __init__(self, _nick, _network, _port, _channels, _ident):
+	def __init__(self, _nick, _network, _port, _channels, _ident, _ctl):
+		self.RECONNECT = 0
+		self.QUIT = 1
 		self.network = _network
+		self.qcode = self.RECONNECT
 		self.nick = _nick
 		self.channels = _channels
 		self.port = _port
@@ -71,6 +75,8 @@ class Bot:
 			"tags" : [],
 			"current_guess" : "-1"
 		}
+		
+		self.ctl = _ctl
 		
 		self.cmdy = {
 			"coffee" : self.water,
@@ -117,12 +123,50 @@ class Bot:
 			"$gelgame_pron" : self.game_pron,
 			"$pic" : self.gelgame_guess,
 			"$tag" : self.gelgame_tag,
-			"?scoreboard" : self.gelgame_scoreboard
+			"?scoreboard" : self.gelgame_scoreboard,
+			
+			self.ctl : self.admin
 		
 		}
+
+	### main irc actions
+	
+	def msg(self, chan, send):
+		print chan
+		mm = "PRIVMSG %s :%s\r\n" %(chan,send)
+		print mm
+		self.irc.send(mm)
+		if chan not in self.logs: self.logs[chan] = Log("logs/%s.log" %(chan))
+		self.logs[chan].write(self.nick, send)
+	
+	def send_raw(self, send):
+		print send
+		self.irc.send(send)
+		
+	def join(self, chan):
+		if chan in self.channels: return
+		self.channels.append(chan)
+		for c in self.channels:
+			self.irc.send("\r\nJOIN " +c+ "\r\n")
+			print "\r\nJOIN " +c+ "\r\n"				
 			
+	def leave(self, chan):
+		if chan not in self.channels: return
+		self.irc.send("\r\nPART "+chan+" i am too holy for this channel!"+"\r\n")
+		print "\r\nPART"+chan+" i am too holy for this channel!"+"\r\n"
+		self.channels.remove(chan)
+
+	def quit(self, code): # code decides whether to reconnect or not
+		self.irc.send("QUIT :aqua-sama is the best goddess! bow down to me!!!\r\n")
+		self.pingable = False
+		self.qcode = code
+		return code
+		
+		
+	## aqua utilities
+	
 	def connect(self):
-		self.irc = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+		self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.irc.settimeout(300)
 		print "setting up irc socket...  %s %i" %(self.network, self.port)
 		self.irc.connect( (self.network, self.port) )
@@ -138,10 +182,8 @@ class Bot:
 		for chan in self.channels:
 			self.irc.send("\r\nJOIN " +chan+ "\r\n")
 			print "\r\nJOIN " +chan+ "\r\n"		
-		#print 'PONG ' + self.data.split() [ 1 ] + '\r\n'
-		
-
-		
+		#print 'PONG ' + self.data.split()[1] + '\r\n'
+		self.pingable = True
 		return True
 
 	def parse_args(self, a, dat):
@@ -175,14 +217,6 @@ class Bot:
 			print "TTTTTTTTTTTTTTTTTT socket timeout"
 			self.pingable = False
 			sys.exit(2507)
-	
-	def join(self, chan):
-		if chan in self.channels: return
-		self.channels.append(chan)
-	
-	def leave(self, chan):
-		if chan not in self.channels: return
-		self.channels.remove(chan)
 	
 	def process_data(self, data):
 		argss = data.split()
@@ -221,23 +255,12 @@ class Bot:
 		if argss[1] == "PRIVMSG": self.logs[chan].write(nn, content)
 		elif argss[1] == "NICK": self.logs[chan].nick(nn, a2)
 		elif argss[1] == "JOIN": self.logs[chan].join(nn)
-		elif argss[1] == "QUIT": self.logs[chan].quit(nn, a2)
+		elif argss[1] == "QUIT": self.logs[chan].self.QUIT(nn, a2)
 		elif argss[1] == "PART": self.logs[chan].leave(nn, content)
 		else: self.logs[chan].raw(data)
-		
-	def msg(self, chan, send):
-		print chan
-		mm = "PRIVMSG %s :%s\r\n" %(chan,send)
-		print mm
-		self.irc.send(mm)
-		if chan not in self.logs: self.logs[chan] = Log("logs/%s.log" %(chan))
-		self.logs[chan].write(self.nick, send)
 	
-	def send_raw(self, send):
-		print send
-		self.irc.send(send)
+	## command functions
 	
-	# command functions
 	def help(self, chan, dum, nick):
 		self.msg(chan, "wow do you need some HELP, %s??? here u go!! https://github.com/golgi-apparatus/aqua/blob/master/readme.md" % nick)
 	
@@ -250,15 +273,7 @@ class Bot:
 	def photo(self, chan, dum, nick):
 		self.msg(chan, "%s, wow why don't you just go to PORNHUB instead you porn addict...SCREW YOU PORN ADDICTS!!!!!!!!!!!" % nick)
 
-	def seppuku(self, chan, dum, nick):
-		self.quit()
-		self.connect()
 
-	def quit(self):
-		self.pingable = False
-
-		
-		
 	## pics
 	
 	def linker(self, tags, scr, err="stop looking up ecchi you...you...h-h-hentai!!!!!!", n="", mode="scrape"):
@@ -307,9 +322,8 @@ class Bot:
 		m = self.linker(tags, err="see, %s,  there's no disgraceful pictures for embarassments to society like you!" % nick, n=nick, scr=choicedict(self.scrapers), mode="scrape")
 		if m: self.msg(chan, m)
 
-	
-
 	## gelbooru
+	
 	def gel_rand(self, chan, dum, nick):
 		g =  self.linker((), n=nick, scr=self.scrapers["gelbooru"], mode="random")
 		self.msg(chan, g)
@@ -389,7 +403,7 @@ class Bot:
 
 		
 		
-	# game functions	
+	## game functions	
 	def gelgame(self, chan, tags, mode="sqe"):
 		if self.game_on:
 			self.msg(chan, "hey there is already a gay going on!! let that one finish first!!")
@@ -544,11 +558,28 @@ class Bot:
 				self.msg(chan, "| %i) %s: %s wins/%s games ( +%s -%s )" %(i, l[0], l[1], l[2], l[3], l[4]))
 				i+=1
 			self.msg(chan, "------------------------------")
-
-	## pixiv
-
 	
-	def quit(self):
-		self.irc.send("QUIT :aqua-sama is the best goddess! bow down to me!!!\r\n")
-		self.pingable = False
-	
+	# maybe you will figure out how to compromise aqua??? lol good luck~
+	def admin(self, chan, tags, nick):
+		print "!!!admin!!!"
+		if not tags: return
+		print tags
+		if tags[0] == "msg" and tags[2]:
+			self.msg(tags[1], " ".join(tags[2:]))
+				
+		elif tags[0] == "join" and tags[1]:
+			print tags[1:]
+			for t in tags[1:]: self.join(t)
+			
+		elif tags[0] == "leave" and tags[1]:
+			print tags[1:]
+			for t in tags[1:]: self.leave(t)
+		
+		elif tags[0] == "quit":
+			self.quit(self.QUIT)
+			sys.exit(2511)
+			
+		elif tags[0] == "rec":
+			self.quit(self.RECONNECT)
+			self.connect()
+						
