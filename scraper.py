@@ -61,7 +61,8 @@ class GelbooruScraper(Scraper):
 		sys.stdout.write("wow webscrape time ::: %s..." % tags)
 		link = "http://gelbooru.com/index.php?page=dapi&s=post&q=index&pid=%s&tags=" % (self.MAXGEL/10 + 1)
 		for t in tags:
-			link+=(t+"+")
+			if t == "homo": link += (random.choice(("yaoi","yuri"))+"+") 
+			else: link+=(t+"+")
 
 		xmlstr = getcatch(link)
 			
