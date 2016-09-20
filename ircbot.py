@@ -126,7 +126,7 @@ class Bot:
 			"$tag" : self.gelgame_tag,
 			"?scoreboard" : self.gelgame_scoreboard,
 			
-			self.ctl : self.admin
+			self.ctl : self.admin  # self.ctl is the string you use to access admin commands. for security, define this in a file called "aqua_controller" and save it to the same directory as this aqua.py. when using admin commands, be careful to do it in pm and not in a public channel! (todo (read: idkwhen): pm only/registered user check)
 		
 		}
 
